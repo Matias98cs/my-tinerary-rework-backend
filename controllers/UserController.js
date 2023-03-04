@@ -145,6 +145,25 @@ const actualizarPerfil = async (req, res) => {
   }
 };
 
+const actulizarPassword = async (req, res) => {
+  const { id } = req.user;
+  const { pwd_actual, pwd_nuevo } = req.body;
+  const user = await User.findById(id);
+  if (!user) {
+    const error = new Error("Hubo un errro");
+    return res.status(400).json({ msg: error.message });
+  }
+
+  if (await user.checkPassword(pwd_actual)) {
+    user.password = pwd_nuevo;
+    await user.save();
+    return res.status(200).json({ msg: "Password actualizada!" });
+  } else {
+    const error = new Error("El password es incorrecto");
+    return res.status(400).json({ msg: error.message });
+  }
+};
+
 export {
   registrar,
   perfil,
@@ -154,4 +173,6 @@ export {
   olvidePassword,
   comprobarToken,
   nuevoPassword,
+  actualizarPerfil,
+  actulizarPassword
 };
