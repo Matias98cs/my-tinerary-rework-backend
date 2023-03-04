@@ -75,4 +75,31 @@ const autenticar = async (req, res) => {
   }
 };
 
-export { registrar, perfil, confirmar };
+const olvidePassword = async (req, res) => {
+  const { email } = req.body;
+  const existeUsuario = await User.findOne({ email });
+  if (!existeUsuario) {
+    const error = new Error("Usuario no existe");
+    return res.status(400).json({ msg: error.message });
+  }
+  try {
+    existeUsuario.token = uuidv4();
+    await existeUsuario.save();
+    //funcion para enviar email para reestablecer password
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const comprobarToken = async (req, res) => {
+  const { token } = req.params;
+  const tokenValido = await User.findOne({ token });
+  if (tokenValido) {
+    res.status(200).json({ msg: "Token valido y el usuario existe" });
+  } else {
+    const error = new Error("Token no valido");
+    return res.status(400).json({ msg: error.message });
+  }
+};
+
+export { registrar, perfil, confirmar, confirmar };
