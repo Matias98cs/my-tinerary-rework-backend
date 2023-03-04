@@ -1,3 +1,4 @@
+import sendEmailToActive from "../helpers/emailRegisterGoogle.js";
 import User from "../models/User.js";
 import { v4 as uuidv4 } from "uuid";
 
@@ -12,7 +13,11 @@ const registrar = async (req, res) => {
     const user = new User(req.body);
     const userGuardado = await user.save();
 
-    //enviar emial
+    sendEmailToActive({
+      email,
+      name,
+      token: userGuardado.token,
+    });
 
     res.status(200).json({
       msg: "Ususario registrado",
@@ -22,3 +27,7 @@ const registrar = async (req, res) => {
     console.error(error);
   }
 };
+
+export {
+    registrar
+}
