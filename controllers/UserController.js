@@ -28,6 +28,25 @@ const registrar = async (req, res) => {
   }
 };
 
-export {
-    registrar
-}
+const perfil = async (req, res, next) => {
+  const { user } = req;
+  res.json(user);
+};
+
+const confirmar = async (req, res, next) => {
+  const { token } = req.params;
+  const userioConfirmar = await User.findOne({ token });
+  if (!userioConfirmar) {
+    const error = new Error("Token no valido");
+    res.status(400).json({ message: error.message });
+  }
+  try {
+    (userioConfirmar.token = null), (userioConfirmar.verified = true);
+    await userioConfirmar.save();
+    res.status(200).json({ msg: "Usuario confirmado correctamente" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export { registrar };
