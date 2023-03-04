@@ -1,3 +1,4 @@
+import ForgetPassword from "../helpers/emailForgetPassword.js";
 import sendEmailToActive from "../helpers/emailRegisterGoogle.js";
 import User from "../models/User.js";
 import { v4 as uuidv4 } from "uuid";
@@ -86,6 +87,11 @@ const olvidePassword = async (req, res) => {
     existeUsuario.token = uuidv4();
     await existeUsuario.save();
     //funcion para enviar email para reestablecer password
+    ForgetPassword({
+      email,
+      name: existeUsuario.name,
+      token: existeUsuario.token,
+    });
   } catch (error) {
     console.log(error);
   }
@@ -174,5 +180,5 @@ export {
   comprobarToken,
   nuevoPassword,
   actualizarPerfil,
-  actulizarPassword
+  actulizarPassword,
 };
