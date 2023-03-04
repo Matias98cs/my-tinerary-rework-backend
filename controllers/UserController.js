@@ -102,4 +102,30 @@ const comprobarToken = async (req, res) => {
   }
 };
 
-export { registrar, perfil, confirmar, confirmar };
+const nuevoPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+  const user = await User.findOne({ token });
+  if (!user) {
+    const error = new Error("Hubo un error");
+    return res.status(400).json({ message: error.message });
+  }
+  try {
+    (user.token = null), (user.password = password);
+    await user.save();
+    res.status(200).json({ msg: "Password actualizado correctamente" });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export {
+  registrar,
+  perfil,
+  confirmar,
+  confirmar,
+  autenticar,
+  olvidePassword,
+  comprobarToken,
+  nuevoPassword,
+};
