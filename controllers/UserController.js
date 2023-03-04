@@ -38,15 +38,41 @@ const confirmar = async (req, res, next) => {
   const userioConfirmar = await User.findOne({ token });
   if (!userioConfirmar) {
     const error = new Error("Token no valido");
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
   }
   try {
     (userioConfirmar.token = null), (userioConfirmar.verified = true);
     await userioConfirmar.save();
-    res.status(200).json({ msg: "Usuario confirmado correctamente" });
+    return res.status(200).json({ msg: "Usuario confirmado correctamente" });
   } catch (error) {
     console.log(error);
   }
 };
 
-export { registrar };
+const autenticar = async (req, res) => {
+  const { email, password } = req.body;
+  const usuario = await User.findOne({ email });
+  if (!usuario) {
+    const error = new Error("El usuario no existe");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  if (!usuario.verified) {
+    const error = new Error("El usuario no ha sido confirmado");
+    return res.status(404).json({ msg: error.message });
+  }
+
+  if (await usuario.checkPassword(password)) {
+    res.json({
+      _id: usuario._id,
+      name: usuario.name,
+      email: usuario.email,
+      token: uuidv4(),
+    });
+  } else {
+    const error = new Error("El password es incorrecto");
+    return res.status(400).json({ msg: error.message });
+  }
+};
+
+export { registrar, perfil, confirmar };
