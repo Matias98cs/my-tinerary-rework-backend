@@ -119,6 +119,32 @@ const nuevoPassword = async (req, res) => {
   }
 };
 
+const actualizarPerfil = async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    const error = new Error("Hubo un error");
+    return res.status(400).json({ msg: error.message });
+  }
+  const { email } = req.body;
+  if (user.email !== req.body.email) {
+    const existeEmail = await User.findOne({ email });
+    if (existeEmail) {
+      const error = new Error("El email ya esta en uso");
+      return res.status(400).json({ msg: error.message });
+    }
+  }
+  try {
+    user.name = req.body.name;
+    user.email = req.body.email;
+    user.lastname = req.body.lastname;
+
+    const userActualizado = await user.save();
+    res.status(200).json(userActualizado);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   registrar,
   perfil,
